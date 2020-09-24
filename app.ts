@@ -12,7 +12,11 @@ client.on('message', (message) => {
   const args = message.content.split(' ');
   const command = commands[args[0].substring(prefix.length)];
   if (command.constraint()) {
-    command.command(client, message, args);
+    try {
+      command.command(client, message, args);
+    } catch (e) {
+      console.error(e);
+    }
   }
 });
 

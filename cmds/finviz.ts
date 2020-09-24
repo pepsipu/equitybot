@@ -2,10 +2,10 @@ import { Client, Message, MessageAttachment } from 'discord.js';
 import { getFinvizTicks } from '../api/finviz';
 
 export default {
-  name: 'finviz',
+  name: 'screener',
   constraint: (): boolean => true,
   command: async (client: Client, message: Message, args: string[]) => {
-    message.channel.send('fetching ticks...');
+    message.channel.send('fetching raw ticks...');
     const ticks = await getFinvizTicks(0);
     switch (args[1]) {
       case 'raw': {
@@ -16,6 +16,7 @@ export default {
       }
       case 'visual':
       default:
+        message.channel.send('unrecognized tick fetch type');
     }
   },
 };
