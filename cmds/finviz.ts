@@ -1,4 +1,4 @@
-import { Client, Message, MessageAttachment } from 'discord.js';
+import { Client, Message } from 'discord.js';
 import { getFinvizTicks } from '../api/finviz';
 
 export default {
@@ -7,16 +7,8 @@ export default {
   command: async (client: Client, message: Message, args: string[]) => {
     message.channel.send('fetching raw ticks...');
     const ticks = await getFinvizTicks(0);
-    switch (args[1]) {
-      case 'raw': {
-        const contents = ticks.map((tick) => `tick: ${tick[0]} price: ${tick[1]} volume: ${tick[2]}`).join('\n');
-        const attachment = new MessageAttachment(Buffer.from(contents), 'ticks.txt');
-        message.channel.send(attachment);
-        break;
-      }
-      case 'visual':
-      default:
-        message.channel.send('unrecognized tick fetch type');
-    }
+    ticks.sort((a, b) => b.volume - a.volume);
+    const content = ticks.map((tick) => `${tick.ticker} vol. ${tick.volume} $${tick.price}`).join('\n').substring(0, 2000);
+    message.channel.send(content.substring(0, content.lastIndexOf('\n')));
   },
 };
