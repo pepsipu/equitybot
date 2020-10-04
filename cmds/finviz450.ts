@@ -11,16 +11,11 @@ export default {
     const start = +args[1];
     const end = +args[2];
     const ticks = (await getFinvizTicksNews(start, end)).slice(0, end);
-    ticks.sort((a, b) => b.volume - a.volume);
-    ticks.forEach((tick, idx) => {
-      checkNewsConstraint(tick.ticker).then((newsGood) => {
-        if (newsGood) {
-          message.channel.send(`${tick.ticker} vol. ${tick.volume} $${tick.price}`);
-        }
-        if (idx === ticks.length - 1) {
-          message.channel.send('done fetching ticks');
-        }
-      });
-    });
+    const tickPromises = ticks.map((tick, idx) => checkNewsConstraint(tick.ticker).then((newsGood) => {
+      if (newsGood) {
+        message.channel.send(`${tick.ticker} vol. ${tick.volume} $${tick.price}`);
+      }
+    }));
+    Promise.all(tickPromises).then(() => message.channel.send('done'));
   },
 };
